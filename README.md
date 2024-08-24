@@ -5,147 +5,201 @@
 <a href="https://github.com/zimv/websocket-heartbeat-js" alt="Github stars"><img src="https://img.shields.io/github/stars/zimv/websocket-heartbeat-js.svg?style=social&label=Star"></a>
 <a href="https://github.com/zimv/websocket-heartbeat-js" alt="Github forks"><img src="https://img.shields.io/github/forks/zimv/websocket-heartbeat-js.svg?style=social&label=Fork"></a>
 <a href="https://github.com/zimv/websocket-heartbeat-js" alt="Github contributors"><img src="https://img.shields.io/github/contributors/zimv/websocket-heartbeat-js.svg"></a>
-# websocket-heartbeat-js [(中文版README)][1]
+# A JavaScript browser WebSockets Heartbeater
+----------------------
 
----
 ## Introduction
-The websocket-heartbeat-js is base on **WebSocket** of browser javascript, whose main purpose is to ensure web client and server connection, and it has a mechanism of heartbeat detection and automatic reconnection. When client device has network outage or server error which causes **websocket** to disconnect, the program will automatically reconnect until reconnecting is successful again.
+The `websocket-heartbeat-js` is based on **`WebSockets`** technology on web browsers using JavaScript.
+The main purpose is to ensure a web client and server connection, and it has a mechanism of heartbeat detection and automatic reconnection. 
+When the client device has a network outage or server error which causes **`WebSockets`** to disconnect, the program will automatically reconnect until reconnection is successful again.
 
 ## Why
-When we use the native **websocket**, if network disconnects, any event function not be executed. So front-end program doesn't know that **websocket** was disconnected. But if program is now executing ***WebSocket.send()***, browser must discover that message signal is failed, so the onclose function will execute.
+When we use the native **`WebSockets`**, if the network disconnects, any `event` function not be executed. So in that case the front-end program won't know that the **`WebSocket`** was disconnected. 
+But if the program is now executing ***`WebSocket.send()`***, the browser should discover that the message signal failed, so then the `onclose` function will execute.
 
 
-Back-end **websocket** service is likely to happen error, when **websocket** disconnected that front-end not notice message received. So need to send ping message by timeout. Server return pong message to client when server received ping message. Because received pong message, client know connection normal. If client not received pong message, it is connection abnormal, client will reconnect.
+The Back-end **`WebSocket`** service is likely to fail or error out, when the **`WebSocket`** disconnected in a way that the front-end won't notice any messages received. 
+So we need to send `ping` requests / messages by `timeout`. The Server returns a `pong` message to the client when the server received a `ping` message. Because it received the `pong` message, the client knows the connection is normal and fine. 
+If the client didn't receive the `pong` message, there's likely something wrong with the connection and it will attempt to reconnect
 
-In summary, for solve above two problems. Client should initiative send ping message for check connect status.
+In summary, for solving the above 2 problems the client should initiate and send a `ping` message for checking the connection status.
 
 ## How
 
-***1.Close websocket connection***
+***1.Close `WebSockets` connection***
 
-If **websocket** need to disconnect, client must execute ***WebsocketHeartbeatJs.close()***. If server wants to disconnect, it should send a close message to client. When client received close message that it to execute ***WebsocketHeartbeatJs.close()***. 
+If a **`WebSocket`** needs to disconnect, client must execute `WebsocketHeartbeatJs.close()`. If the server wants to disconnect, it should send a `close` message to the client. 
+When the client receives a `close` message that it's to execute
+`WebsocketHeartbeatJs.close()`. 
 
-**Example:**
+## **Example:**
 
-    websocketHeartbeatJs.onmessage = (e) => {
-        if(e.data == 'close') websocketHeartbeatJs.close();
-    }
-
+```javascript
+websocketHeartbeatJs.onmessage = (e) => {
+if(e.data == 'close')
+websocketHeartbeatJs.close();
+}
+```
  
-***2.Ping & Pong***
+***2. `Ping` & `Pong`***
 
-Server should to return pong message when the client sends a ping message. Pong message can be of any value. websocket-heartbeat-js will not handle pong message, instead it will only reset heartbeat after receiving any message, as receiving any message means that the connection is normal.
+The server should `return` a `pong` message when the client sends a `ping` message. The `pong` message can be of any value. 
+`websocket-heartbeat-js` will not handle `pong` messages, instead it will only reset the heartbeat after receiving any message, as receiving any message means that the connection is normal and working as intended.
 
- 
-## Usage
-### Install
-    npm install websocket-heartbeat-js
+## **Installation:**
+```console
+npm install websocket-heartbeat-js
+```
 
-### Import
+## **Importing**:
+```javascript
 
-    import WebsocketHeartbeatJs from 'websocket-heartbeat-js';
-    let websocketHeartbeatJs = new WebsocketHeartbeatJs({
-        url: 'ws://xxxxxxx'
-    });
-    websocketHeartbeatJs.onopen = function () {
-        console.log('connect success');
-        websocketHeartbeatJs.send('hello server');
-    }
-    websocketHeartbeatJs.onmessage = function (e) {
-        console.log(`onmessage: ${e.data}`);
-    }
-    websocketHeartbeatJs.onreconnect = function () {
-        console.log('reconnecting...');
-    }
+import WebsocketHeartbeatJs from 'websocket-heartbeat-js';
 
-#### Use script
+let websocketHeartbeatJs = new WebsocketHeartbeatJs({
+    url: 'ws://xxxxxxx'
+});
 
-    <script src="./node_modules/websocket-heartbeat-js/dist/index.js"></script>
-    let websocketHeartbeatJs = new window.WebsocketHeartbeatJs({
-        url: 'ws://xxxxxxx'
-    });
+websocketHeartbeatJs.onopen = function () {
+    console.log('STATUS: Successfully connected');
 
-## API
-### websocketHeartbeatJs.ws (WebSocket)
-This ***websocketHeartbeatJs.ws*** is native **Websocket** instance. If you need more native **Websocket** features, operate the ***websocketHeartbeatJs.ws***.
+websocketHeartbeatJs.send('hello server');
+}
 
-    websocketHeartbeatJs.ws == WebSocket(websocketHeartbeatJs.opts.url);
+websocketHeartbeatJs.onmessage = function (e) {
+    console.log(`onmessage: ${e.data}`);
+}
 
-### websocketHeartbeatJs.opts (Object)
+websocketHeartbeatJs.onreconnect = function () {
+    console.log('STATUS: Reconnecting...');
+}
+
+```
+
+### **Using the script**:
+```javascript
+
+<script src="./node_modules/websocket-heartbeat-js/dist/index.js">
+</script>
+
+let websocketHeartbeatJs = new window.WebsocketHeartbeatJs({
+    url: 'ws://xxxxxxx'
+});
+
+```
+
+## **API**:
+
+#### **`websocketHeartbeatJs.ws`**
+
+This `websocketHeartbeatJs.ws` is a native **`WebSocket`** instance. If you need more native **`WebSocket`** features, use the `websocketHeartbeatJs.ws`
+
+```javascript
+websocketHeartbeatJs.ws == WebSocket(websocketHeartbeatJs.opts.url);
+```
+
+####  **`websocketHeartbeatJs.opts`**
+(Object)
     
 | Attribute | required | type | default | description |
 | ------ | ------ | ------ | ------ | ------ |
-| url | true | string | none | websocket service address |
-| protocols | false | string or string[] | none | new WebSocket(, protocols)|
-| pingTimeout | false | number | 15000 | A heartbeat is sent every 15 seconds. If any backend message is received, the timer will reset |
-| pongTimeout | false | number | 10000 | After the Ping message is sent, the connection will be disconnected without receiving the backend message within 10 seconds |
-| reconnectTimeout | false | number | 2000 | The interval of reconnection |
-| pingMsg | false | any | "heartbeat" / ()=>"heartbeat"| Ping message value |
-| repeatLimit | false | number | null | The trial times of reconnection。default: unlimited |
+| `url` | `true` | `string` | `none` | `WebSocket` service address |
+| `protocols` | `false` | `string` or `string[]` | `none` | `new WebSocket`(protocols)|
+| `pingTimeout` | `false` | `number` | `15000` | A heartbeat is sent every 15 seconds (15000ms). If any backend messages are received, the timer will reset |
+| `pongTimeout` | `false` | `number` | `10000` | After the `ping` message is sent, the connection will be disconnected without receiving the backend message within 10 seconds (10000ms) |
+| `reconnectTimeout` | `false` | `number` | `2000` | The interval for reconnecting |
+| `pingMsg` | `false` | `any` | `"heartbeat" / ()=>"heartbeat"`| `ping` message value |
+| `repeatLimit` | `false` | `number` | `null` | The amount of times to attempt reconnection default: `unlimited` |
 
+```javascript
+const options = {
+    url: 'ws://xxxx',
+    pingTimeout: 15000, 
+    pongTimeout: 10000, 
+    reconnectTimeout: 2000,
+    pingMsg: "heartbeat"
+}
 
-    const options = {
-        url: 'ws://xxxx',
-        pingTimeout: 15000, 
-        pongTimeout: 10000, 
-        reconnectTimeout: 2000,
-        pingMsg: "heartbeat"
-    }
-    let websocketHeartbeatJs = new WebsocketHeartbeatJs(options);
+let websocketHeartbeatJs = new WebsocketHeartbeatJs(options);
+```
 
-### websocketHeartbeatJs.send(msg) (function)
-Send the message to the back-end service
+#### **`websocketHeartbeatJs.send(msg)`**
+(function)
 
-    websocketHeartbeatJs.send('hello server');
+Sends the message to the back-end service
 
-### websocketHeartbeatJs.close() (function)
-The front end manually disconnects the websocket connection. This method does not trigger reconnection.
+```javascript
+websocketHeartbeatJs.send('Hello server');
+```
 
-### hook function and event function
-#### websocketHeartbeatJs.onclose (function)
+#### **`websocketHeartbeatJs.close()`**
+(function)
 
-    websocketHeartbeatJs.onclose = (e) => {
-        console.log('connect close');
-    }
+The front-end end manually disconnects the `WebSocket` connection. This method does not trigger reconnection.
 
-#### websocketHeartbeatJs.onerror (function)
+## **Hooking events / functions**
 
-    websocketHeartbeatJs.onerror = (e) => {
-        console.log('connect onerror');
-    }
+#### `websocketHeartbeatJs.onclose` 
+(function)
 
-#### websocketHeartbeatJs.onopen (function)
+```javascript
 
-    websocketHeartbeatJs.onopen = (e) => {
-        console.log('open success');
-    }
+websocketHeartbeatJs.onclose = (e) => {
+    console.log('STATUS: Connection Closed');
+}
 
-#### websocketHeartbeatJs.onmessage (function)
+```
 
-    websocketHeartbeatJs.onmessage = (e) => {
-        console.log('msg:', e.data);
-    }
+#### **`websocketHeartbeatJs.onerror`**
+(function)
 
-#### websocketHeartbeatJs.onreconnect (function)
+```javascript
+websocketHeartbeatJs.onerror = (e) => {
+    console.log('connect onerror');
+}
+```
 
-    websocketHeartbeatJs.onreconnect = (e) => {
-        console.log('reconnecting...');
-    }
+#### **`websocketHeartbeatJs.onopen`**
+(function)
 
-## Demo
+```javascript
+websocketHeartbeatJs.onopen = (e) => {
+    console.log('open success');
+}
+```
+
+#### **`websocketHeartbeatJs.onmessage`**
+(function)
+
+```javascript
+websocketHeartbeatJs.onmessage = (e) => {
+    console.log('msg:', e.data);
+}
+```
+
+#### **`websocketHeartbeatJs.onreconnect`**
+(function)
+
+```javascript
+websocketHeartbeatJs.onreconnect = (e) => {
+    console.log('Reconnecting...');
+}
+```
+
+## **Demo**:
 [demo show][2]
 
 
-## Blog
-[初探和实现websocket心跳重连][3]
+#### Blog
+[初探和实现WebSocket心跳重连][3]
 
 
 
-## Similar package
-[websocket-heartbeat-miniprogram][4]
+### **Similar utilities:**
+[`websocket-heartbeat-miniprogram`][4]
 
 
-  [1]: https://github.com/zimv/websocket-heartbeat-js/blob/master/README-zh.md
-  [2]: http://htmlpreview.github.io/?https://github.com/zimv/websocket-heartbeat-js/blob/master/demo/index.html
-  [3]: http://www.cnblogs.com/1wen/p/5808276.html
-  [4]: https://github.com/zimv/websocket-heartbeat-miniprogram
+  [1]: <https://github.com/zimv/websocket-heartbeat-js/blob/master/README-zh.md>
+  [2]: <https://htmlpreview.github.io/?https://github.com/zimv/websocket-heartbeat-js/blob/master/demo/index.html>
+  [3]: <https://www.cnblogs.com/1wen/p/5808276.html>
+  [4]: <https://github.com/zimv/websocket-heartbeat-miniprogram>
